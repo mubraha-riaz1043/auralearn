@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>AuraLearn – Future of Learning</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;700&family=Rajdhani:wght@300;500;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--p:#7c3aed;--n:#06b6d4;--pk:#ec4899;--d:#030712;--g:rgba(255,255,255,.04);--b:rgba(255,255,255,.08)}
+html{scroll-behavior:smooth}
+body{background:var(--d);color:#fff;font-family:'Inter',sans-serif;overflow-x:hidden;cursor:none}
+#cursor{position:fixed;width:12px;height:12px;background:var(--n);border-radius:50%;pointer-events:none;z-index:9999;mix-blend-mode:screen;transition:transform .1s}
+#cursor-ring{position:fixed;width:40px;height:40px;border:1.5px solid var(--p);border-radius:50%;pointer-events:none;z-index:9998;transition:all .15s ease}
+#bg-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--p)}
+
+/* NAV */
+nav{position:fixed;top:0;width:100%;z-index:1000;padding:.9rem 2.5rem;display:flex;align-items:center;justify-content:space-between;background:rgba(3,7,18,.7);backdrop-filter:blur(24px);border-bottom:1px solid var(--b)}
+.logo{font-family:'Orbitron',sans-serif;font-size:1.3rem;font-weight:900;background:linear-gradient(135deg,var(--p),var(--n));-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:flex;align-items:center;gap:.5rem}
+.nav-links{display:flex;gap:2rem;list-style:none}
+.nav-links a{color:rgba(255,255,255,.65);text-decoration:none;font-size:.88rem;letter-spacing:.04em;transition:color .3s;position:relative}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1px;background:var(--n);transition:width .3s}
+.nav-links a:hover{color:#fff}.nav-links a:hover::after{width:100%}
+.nav-btns{display:flex;gap:.75rem}
+.btn{padding:.5rem 1.3rem;border-radius:50px;font-size:.83rem;font-weight:600;cursor:none;transition:all .3s;border:none;letter-spacing:.04em}
+.btn-ghost{background:transparent;border:1px solid var(--b);color:#fff}.btn-ghost:hover{border-color:var(--n);color:var(--n);box-shadow:0 0 20px rgba(6,182,212,.2)}
+.btn-primary{background:linear-gradient(135deg,var(--p),var(--n));color:#fff}.btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 30px rgba(124,58,237,.5)}
+
+/* HERO */
+#hero{position:relative;z-index:1;min-height:100vh;display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:6rem 5% 2rem;gap:2rem}
+.hero-left{}
+.hero-badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.4);padding:.4rem 1rem;border-radius:50px;font-size:.78rem;color:#a78bfa;margin-bottom:1.5rem;animation:pulse-b 2s infinite}
+@keyframes pulse-b{0%,100%{box-shadow:0 0 0 0 rgba(124,58,237,.3)}50%{box-shadow:0 0 0 8px rgba(124,58,237,0)}}
+.dot{width:6px;height:6px;background:#a78bfa;border-radius:50%;animation:blink 1.2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+h1.ht{font-family:'Orbitron',sans-serif;font-size:clamp(2rem,4.5vw,4rem);font-weight:900;line-height:1.08;margin-bottom:1.2rem}
+.gt{background:linear-gradient(135deg,var(--n),var(--p));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{font-size:1rem;color:rgba(255,255,255,.5);line-height:1.75;margin-bottom:2rem;max-width:480px}
+.hbtns{display:flex;gap:1rem;flex-wrap:wrap}
+.bx{padding:.8rem 2rem;border-radius:50px;font-size:.95rem;font-weight:700;cursor:none;transition:all .3s;border:none;letter-spacing:.04em}
+.bg{background:linear-gradient(135deg,var(--p),var(--n));color:#fff;box-shadow:0 0 40px rgba(124,58,237,.35)}.bg:hover{transform:translateY(-3px);box-shadow:0 0 60px rgba(124,58,237,.6)}
+.bo{background:transparent;border:1px solid rgba(255,255,255,.2);color:#fff}.bo:hover{border-color:var(--n);color:var(--n)}
+
+/* Hero right – image collage */
+.hero-right{position:relative;height:520px}
+.hero-img-main{position:absolute;top:0;right:0;width:320px;height:340px;border-radius:24px;object-fit:cover;border:2px solid rgba(124,58,237,.4);box-shadow:0 0 60px rgba(124,58,237,.3);animation:float1 4s ease-in-out infinite}
+.hero-img-2{position:absolute;bottom:20px;left:0;width:200px;height:200px;border-radius:20px;object-fit:cover;border:2px solid rgba(6,182,212,.4);box-shadow:0 0 40px rgba(6,182,212,.25);animation:float2 5s ease-in-out infinite}
+.hero-img-3{position:absolute;top:160px;left:110px;width:160px;height:160px;border-radius:16px;object-fit:cover;border:2px solid rgba(236,72,153,.4);box-shadow:0 0 30px rgba(236,72,153,.2);animation:float3 3.5s ease-in-out infinite}
+.hero-badge-float{position:absolute;top:20px;left:10px;background:rgba(3,7,18,.8);backdrop-filter:blur(12px);border:1px solid var(--b);border-radius:16px;padding:.75rem 1rem;font-size:.8rem;animation:float2 4s ease-in-out infinite}
+.hero-badge-float strong{color:var(--n);display:block;font-family:'Orbitron',sans-serif;font-size:.9rem}
+.hero-stat-float{position:absolute;bottom:60px;right:10px;background:rgba(124,58,237,.15);backdrop-filter:blur(12px);border:1px solid rgba(124,58,237,.3);border-radius:16px;padding:.75rem 1.2rem;text-align:center;animation:float1 4.5s ease-in-out infinite}
+.hero-stat-float strong{font-family:'Orbitron',sans-serif;font-size:1.4rem;color:var(--p);display:block}
+@keyframes float1{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+@keyframes float2{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes float3{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
+
+/* Stats bar */
+.stats-bar{position:relative;z-index:1;display:flex;justify-content:center;gap:0;border-top:1px solid var(--b);border-bottom:1px solid var(--b);background:rgba(255,255,255,.02)}
+.stat-item{flex:1;max-width:220px;padding:2rem;text-align:center;border-right:1px solid var(--b)}
+.stat-item:last-child{border-right:none}
+.stat-num{font-family:'Orbitron',sans-serif;font-size:1.8rem;font-weight:900;background:linear-gradient(135deg,var(--n),var(--p));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-lbl{font-size:.75rem;color:rgba(255,255,255,.35);letter-spacing:.12em;margin-top:.3rem}
+
+/* Generic section */
+section{position:relative;z-index:1;padding:5rem 5%}
+.container{max-width:1200px;margin:0 auto}
+.sec-label{font-size:.72rem;letter-spacing:.2em;color:var(--n);text-transform:uppercase;margin-bottom:.6rem}
+.sec-title{font-family:'Orbitron',sans-serif;font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:900;margin-bottom:.75rem}
+.sec-sub{color:rgba(255,255,255,.45);max-width:480px;line-height:1.7;font-size:.95rem}
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--p),var(--n),var(--p),transparent);opacity:.25;position:relative;z-index:1}
+
+/* FEATURES BANNER */
+#features{background:linear-gradient(180deg,transparent,rgba(124,58,237,.04),transparent)}
+.feat-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;margin-top:3rem}
+.feat-img-wrap{position:relative}
+.feat-img-main{width:100%;border-radius:24px;object-fit:cover;height:380px;border:1px solid var(--b);box-shadow:0 0 80px rgba(124,58,237,.2)}
+.feat-img-over{position:absolute;bottom:-20px;right:-20px;width:160px;height:160px;border-radius:16px;object-fit:cover;border:2px solid rgba(6,182,212,.5);box-shadow:0 0 40px rgba(6,182,212,.3);animation:float1 4s ease-in-out infinite}
+.feat-list{list-style:none;margin-top:1.5rem}
+.feat-list li{display:flex;gap:1rem;padding:1rem 0;border-bottom:1px solid var(--b);align-items:flex-start}
+.feat-list li:last-child{border-bottom:none}
+.feat-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+
+/* COURSES */
+.courses-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:1.5rem;margin-top:3rem}
+.cc{background:var(--g);border:1px solid var(--b);border-radius:20px;overflow:hidden;transition:all .4s;cursor:none;position:relative}
+.cc:hover{transform:translateY(-8px);border-color:rgba(124,58,237,.5);box-shadow:0 24px 60px rgba(124,58,237,.2)}
+.cc-thumb{height:170px;object-fit:cover;width:100%;display:block;transition:transform .4s}
+.cc:hover .cc-thumb{transform:scale(1.07)}
+.cc-over{position:absolute;top:0;left:0;right:0;height:170px;background:linear-gradient(180deg,transparent 40%,rgba(3,7,18,.9))}
+.cc-body{padding:1.25rem}
+.cc-tag{font-size:.68rem;letter-spacing:.1em;color:var(--n);background:rgba(6,182,212,.1);padding:.25rem .75rem;border-radius:50px;display:inline-block;margin-bottom:.65rem;border:1px solid rgba(6,182,212,.2)}
+.cc-title{font-weight:700;font-size:.95rem;margin-bottom:.35rem;line-height:1.4}
+.cc-inst{font-size:.8rem;color:rgba(255,255,255,.4);margin-bottom:.65rem}
+.cc-meta{display:flex;justify-content:space-between;align-items:center;padding-top:.75rem;border-top:1px solid var(--b)}
+.cc-price{font-family:'Orbitron',sans-serif;font-size:.95rem;font-weight:700;color:var(--n)}
+.cc-dur{font-size:.78rem;color:rgba(255,255,255,.35)}
+.stars{color:#fbbf24;font-size:.78rem}
+
+/* INSTRUCTORS */
+.inst-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:1.5rem;margin-top:3rem}
+.ic{background:var(--g);border:1px solid var(--b);border-radius:20px;overflow:hidden;transition:all .4s;cursor:none;text-align:center}
+.ic:hover{transform:translateY(-6px);border-color:rgba(124,58,237,.5);box-shadow:0 20px 50px rgba(124,58,237,.15)}
+.ic-img{width:100%;height:200px;object-fit:cover;object-position:top;display:block;transition:transform .4s}
+.ic:hover .ic-img{transform:scale(1.05)}
+.ic-body{padding:1.25rem}
+.ic-name{font-weight:700;font-size:1rem;margin-bottom:.25rem}
+.ic-role{font-size:.8rem;color:var(--n);margin-bottom:.6rem}
+.ic-stats{display:flex;justify-content:center;gap:1.5rem;font-size:.78rem;color:rgba(255,255,255,.4)}
+
+/* TESTIMONIALS */
+.testi-track{overflow:hidden;margin-top:3rem;position:relative}
+.testi-track::before,.testi-track::after{content:'';position:absolute;top:0;width:120px;height:100%;z-index:2}
+.testi-track::before{left:0;background:linear-gradient(90deg,var(--d),transparent)}
+.testi-track::after{right:0;background:linear-gradient(-90deg,var(--d),transparent)}
+.testi-inner{display:flex;gap:1.5rem;animation:scroll-t 35s linear infinite}
+.testi-inner:hover{animation-play-state:paused}
+.tc{min-width:310px;background:var(--g);border:1px solid var(--b);border-radius:20px;padding:1.5rem;flex-shrink:0;transition:border-color .3s}
+.tc:hover{border-color:rgba(124,58,237,.4)}
+.tc-stars{color:#fbbf24;font-size:.85rem;margin-bottom:.75rem}
+.tc-text{font-size:.88rem;color:rgba(255,255,255,.65);line-height:1.65;margin-bottom:1rem;font-style:italic}
+.tc-user{display:flex;align-items:center;gap:.75rem}
+.tc-avatar{width:44px;height:44px;border-radius:50%;object-fit:cover;object-position:top;border:2px solid rgba(124,58,237,.4)}
+.tc-info strong{font-size:.88rem}
+.tc-info small{color:rgba(255,255,255,.35);font-size:.75rem;display:block}
+@keyframes scroll-t{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* ZOOM CLASSES */
+#zoom{background:linear-gradient(180deg,transparent,rgba(6,182,212,.03),transparent)}
+.zoom-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.5rem;margin-top:3rem}
+.zc{background:var(--g);border:1px solid var(--b);border-radius:20px;overflow:hidden;display:flex;flex-direction:column;transition:all .4s;cursor:none}
+.zc:hover{border-color:rgba(6,182,212,.4);transform:translateY(-5px);box-shadow:0 20px 50px rgba(6,182,212,.1)}
+.zc-img{width:100%;height:140px;object-fit:cover;display:block}
+.zc-body{padding:1.25rem;flex:1}
+.zc-live{display:inline-flex;align-items:center;gap:.4rem;font-size:.7rem;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#f87171;padding:.2rem .75rem;border-radius:50px;margin-bottom:.75rem}
+.zc-dot{width:6px;height:6px;background:#ef4444;border-radius:50%;animation:blink 1s infinite}
+.zc-title{font-weight:700;font-size:.95rem;margin-bottom:.5rem}
+.zc-meta{font-size:.8rem;color:rgba(255,255,255,.4);margin-bottom:1rem}
+.btn-join{width:100%;padding:.65rem;border-radius:50px;font-size:.85rem;font-weight:700;background:linear-gradient(135deg,var(--n),var(--p));color:#fff;border:none;cursor:none;transition:all .3s}
+.btn-join:hover{box-shadow:0 0 25px rgba(6,182,212,.4);transform:translateY(-2px)}
+
+/* PRICING */
+.price-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:1.5rem;margin-top:3rem}
+.pc{background:var(--g);border:1px solid var(--b);border-radius:24px;padding:2rem;position:relative;transition:all .4s;cursor:none}
+.pc.hot{border-color:var(--p);box-shadow:0 0 60px rgba(124,58,237,.18)}
+.pc-badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--p),var(--n));padding:.3rem 1rem;border-radius:50px;font-size:.72rem;font-weight:700;white-space:nowrap}
+.pc-plan{font-size:.75rem;letter-spacing:.15em;color:rgba(255,255,255,.45);margin-bottom:.4rem}
+.pc-amt{font-family:'Orbitron',sans-serif;font-size:2.2rem;font-weight:900;margin-bottom:1.5rem}
+.pc-amt span{font-size:.9rem;color:rgba(255,255,255,.35);font-family:'Inter',sans-serif}
+.pc-feats{list-style:none;margin-bottom:2rem}
+.pc-feats li{padding:.45rem 0;font-size:.88rem;color:rgba(255,255,255,.65);display:flex;gap:.75rem;border-bottom:1px solid var(--b)}
+.pc-feats li::before{content:'✦';color:var(--n);flex-shrink:0}
+.btn-f{width:100%;padding:.8rem;border-radius:50px;font-weight:700;font-size:.88rem;cursor:none;transition:all .3s;border:none;letter-spacing:.04em}
+.btn-fp{background:linear-gradient(135deg,var(--p),var(--n));color:#fff}.btn-fp:hover{transform:translateY(-2px);box-shadow:0 0 30px rgba(124,58,237,.4)}
+.btn-fb{background:transparent;border:1px solid var(--b);color:#fff}.btn-fb:hover{border-color:var(--p);color:var(--p)}
+
+/* CTA */
+#cta{text-align:center}
+.cta-wrap{position:relative;overflow:hidden}
+.cta-bg-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.12;border-radius:28px}
+.cta-box{background:linear-gradient(135deg,rgba(124,58,237,.18),rgba(6,182,212,.1));border:1px solid rgba(124,58,237,.35);border-radius:28px;padding:5rem 2rem;position:relative}
+.cta-title{font-family:'Orbitron',sans-serif;font-size:clamp(1.6rem,4vw,2.8rem);font-weight:900;margin-bottom:1rem}
+.cta-sub{color:rgba(255,255,255,.45);margin-bottom:2rem}
+
+/* FOOTER */
+footer{position:relative;z-index:1;border-top:1px solid var(--b);padding:3rem 5% 2rem}
+.foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem;margin-bottom:3rem}
+.foot-logo{font-family:'Orbitron',sans-serif;font-size:1.3rem;font-weight:900;background:linear-gradient(135deg,var(--p),var(--n));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.75rem}
+.foot-desc{font-size:.85rem;color:rgba(255,255,255,.35);line-height:1.7}
+.foot-col h4{font-size:.78rem;letter-spacing:.12em;color:rgba(255,255,255,.4);text-transform:uppercase;margin-bottom:1rem}
+.foot-col a{display:block;color:rgba(255,255,255,.5);text-decoration:none;font-size:.85rem;margin-bottom:.5rem;transition:color .3s}
+.foot-col a:hover{color:var(--n)}
+.foot-bottom{border-top:1px solid var(--b);padding-top:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:gap}
+.foot-copy{color:rgba(255,255,255,.2);font-size:.8rem}
+.socials{display:flex;gap:1rem}
+.socials a{width:36px;height:36px;border:1px solid var(--b);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.9rem;text-decoration:none;transition:all .3s;color:#fff}
+.socials a:hover{border-color:var(--p);box-shadow:0 0 15px rgba(124,58,237,.3);background:rgba(124,58,237,.1)}
+
+/* Float label */
+.float-btn{position:fixed;bottom:2rem;right:2rem;background:linear-gradient(135deg,var(--p),var(--n));padding:.65rem 1.4rem;border-radius:50px;font-size:.82rem;font-weight:700;z-index:1000;animation:float1 3s ease-in-out infinite;cursor:none;box-shadow:0 0 30px rgba(124,58,237,.4)}
+
+/* Reveal */
+.reveal{opacity:0;transform:translateY(28px);transition:all .75s cubic-bezier(.16,1,.3,1)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-l{opacity:0;transform:translateX(-30px);transition:all .75s cubic-bezier(.16,1,.3,1)}
+.reveal-l.visible{opacity:1;transform:translateX(0)}
+.reveal-r{opacity:0;transform:translateX(30px);transition:all .75s cubic-bezier(.16,1,.3,1)}
+.reveal-r.visible{opacity:1;transform:translateX(0)}
+
+/* Orbs */
+.orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(110px);opacity:.1}
+#o1{width:500px;height:500px;background:var(--p);top:-200px;left:-200px}
+#o2{width:400px;height:400px;background:var(--n);bottom:-150px;right:-150px}
+
+@media(max-width:900px){
+  #hero{grid-template-columns:1fr;padding-top:7rem}
+  .hero-right{display:none}
+  .foot-grid{grid-template-columns:1fr 1fr}
+  .feat-grid{grid-template-columns:1fr}
+}
+@media(max-width:600px){.nav-links{display:none}.foot-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+<div id="o1" class="orb"></div>
+<div id="o2" class="orb"></div>
+<canvas id="bg-canvas"></canvas>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">⬡ AuraLearn</div>
+  <ul class="nav-links">
+    <li><a href="#courses">Courses</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#instructors">Instructors</a></li>
+    <li><a href="#zoom">Live Classes</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+  </ul>
+  <div class="nav-btns">
+    <button class="btn btn-ghost">Login</button>
+    <button class="btn btn-primary">Get Started</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-left reveal-l">
+    <div class="hero-badge"><span class="dot"></span> AI-Powered Learning • Next Gen Platform</div>
+    <h1 class="ht">Learn Beyond<br><span class="gt">The Universe</span></h1>
+    <p class="hero-sub">Master cutting-edge tech skills with immersive 3D courses, live Zoom sessions, AI-driven quizzes, and industry-recognized certificates — built for the next generation.</p>
+    <div class="hbtns">
+      <button class="bx bg">🚀 Start Learning Free</button>
+      <button class="bx bo">▶ Watch Demo</button>
+    </div>
+  </div>
+  <div class="hero-right reveal-r">
+    <img class="hero-img-main" src="https://images.unsplash.com/photo-1484417894907-623942c8ee29?w=600&q=80" alt="Coding"/>
+    <img class="hero-img-2" src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&q=80" alt="Dev"/>
+    <img class="hero-img-3" src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=400&q=80" alt="AI"/>
+    <div class="hero-badge-float"><strong id="live-count">1,247</strong>students online now 🟢</div>
+    <div class="hero-stat-float"><strong>98%</strong><small style="color:rgba(255,255,255,.4);font-size:.72rem">Success Rate</small></div>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat-item"><div class="stat-num" data-target="50000">0</div><div class="stat-lbl">Students</div></div>
+  <div class="stat-item"><div class="stat-num" data-target="120">0</div><div class="stat-lbl">Courses</div></div>
+  <div class="stat-item"><div class="stat-num" data-target="98">0</div><div class="stat-lbl">% Success Rate</div></div>
+  <div class="stat-item"><div class="stat-num" data-target="40">0</div><div class="stat-lbl">Instructors</div></div>
+  <div class="stat-item"><div class="stat-num" data-target="500">0</div><div class="stat-lbl">Certificates Issued</div></div>
+</div>
+
+<div class="divider"></div>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="container">
+    <div class="feat-grid">
+      <div class="feat-img-wrap reveal-l">
+        <img class="feat-img-main" src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=700&q=80" alt="Learning"/>
+        <img class="feat-img-over" src="https://images.unsplash.com/photo-1551650975-87deedd944c3?w=300&q=80" alt="Mobile"/>
+      </div>
+      <div class="reveal-r">
+        <div class="sec-label">✦ Why AuraLearn</div>
+        <h2 class="sec-title">Everything You Need to <span class="gt">Succeed</span></h2>
+        <p class="sec-sub">A complete ecosystem — from beginner to pro — with tools that make learning feel like an adventure.</p>
+        <ul class="feat-list">
+          <li><div class="feat-icon" style="background:rgba(124,58,237,.15)">🤖</div><div><strong>AI-Powered Quizzes</strong><br><small style="color:rgba(255,255,255,.4)">Adaptive tests that learn your weak spots and strengthen them</small></div></li>
+          <li><div class="feat-icon" style="background:rgba(6,182,212,.12)">📹</div><div><strong>Live Zoom Classes</strong><br><small style="color:rgba(255,255,255,.4)">Real-time sessions with top industry instructors worldwide</small></div></li>
+          <li><div class="feat-icon" style="background:rgba(236,72,153,.12)">🏆</div><div><strong>Verified Certificates</strong><br><small style="color:rgba(255,255,255,.4)">Industry-recognized certificates downloadable as PDF</small></div></li>
+          <li><div class="feat-icon" style="background:rgba(251,191,36,.1)">📊</div><div><strong>Progress Analytics</strong><br><small style="color:rgba(255,255,255,.4)">Track every module, quiz score, and milestone in real-time</small></div></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- COURSES -->
+<section id="courses">
+  <div class="container">
+    <div class="reveal" style="text-align:center">
+      <div class="sec-label">✦ What You'll Master</div>
+      <h2 class="sec-title">Featured <span class="gt">Courses</span></h2>
+      <p class="sec-sub" style="margin:0 auto">10+ premium tech courses by real industry experts. Enroll today.</p>
+    </div>
+    <div class="courses-grid" id="courses-grid"></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- INSTRUCTORS -->
+<section id="instructors" style="background:linear-gradient(180deg,transparent,rgba(124,58,237,.03),transparent)">
+  <div class="container">
+    <div class="reveal" style="text-align:center">
+      <div class="sec-label">✦ The Experts</div>
+      <h2 class="sec-title">World-Class <span class="gt">Instructors</span></h2>
+      <p class="sec-sub" style="margin:0 auto">Learn from engineers at Google, Meta, Amazon & top startups.</p>
+    </div>
+    <div class="inst-grid" id="inst-grid"></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="container">
+    <div class="reveal" style="text-align:center">
+      <div class="sec-label">✦ Student Stories</div>
+      <h2 class="sec-title">What They <span class="gt">Say</span></h2>
+    </div>
+  </div>
+  <div class="testi-track"><div class="testi-inner" id="testi-inner"></div></div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ZOOM CLASSES -->
+<section id="zoom">
+  <div class="container">
+    <div class="reveal">
+      <div class="sec-label">✦ Live Learning</div>
+      <h2 class="sec-title">Upcoming <span class="gt">Live Classes</span></h2>
+      <p class="sec-sub">Join real-time Zoom sessions. Ask questions, learn faster.</p>
+    </div>
+    <div class="zoom-grid reveal" id="zoom-grid"></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="container">
+    <div class="reveal" style="text-align:center">
+      <div class="sec-label">✦ Simple Pricing</div>
+      <h2 class="sec-title">Choose Your <span class="gt">Plan</span></h2>
+    </div>
+    <div class="price-grid reveal">
+      <div class="pc">
+        <div class="pc-plan">STARTER</div>
+        <div class="pc-amt">Free <span>/mo</span></div>
+        <ul class="pc-feats"><li>3 Free Courses</li><li>Community Access</li><li>Basic Quizzes</li><li>Student Dashboard</li></ul>
+        <button class="btn-f btn-fb">Get Started Free</button>
+      </div>
+      <div class="pc hot">
+        <div class="pc-badge">⚡ Most Popular</div>
+        <div class="pc-plan">PRO</div>
+        <div class="pc-amt">$29 <span>/mo</span></div>
+        <ul class="pc-feats"><li>All 120+ Courses</li><li>Live Zoom Classes</li><li>Certificates</li><li>AI Study Assistant</li><li>Download Resources</li><li>Priority Support</li></ul>
+        <button class="btn-f btn-fp">Start Pro Plan</button>
+      </div>
+      <div class="pc">
+        <div class="pc-plan">ENTERPRISE</div>
+        <div class="pc-amt">$99 <span>/mo</span></div>
+        <ul class="pc-feats"><li>Everything in Pro</li><li>Team Management</li><li>Custom Certificates</li><li>API Access</li><li>Dedicated Manager</li></ul>
+        <button class="btn-f btn-fb">Contact Sales</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <div class="container">
+    <div class="cta-wrap reveal">
+      <img class="cta-bg-img" src="https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=1200&q=80" alt="Space"/>
+      <div class="cta-box">
+        <div class="sec-label" style="text-align:center">✦ Ready to Launch?</div>
+        <h2 class="cta-title">Begin Your <span class="gt">Journey</span> Today</h2>
+        <p class="cta-sub">Join 50,000+ students already learning on AuraLearn. No credit card required.</p>
+        <button class="bx bg">🚀 Create Free Account</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-logo">⬡ AuraLearn</div>
+        <p class="foot-desc">The next-gen AI-powered e-learning platform built for the dreamers, builders, and creators of tomorrow.</p>
+      </div>
+      <div class="foot-col"><h4>Platform</h4><a href="#">Courses</a><a href="#">Live Classes</a><a href="#">Certificates</a><a href="#">Dashboard</a></div>
+      <div class="foot-col"><h4>Company</h4><a href="#">About Us</a><a href="#">Blog</a><a href="#">Careers</a><a href="#">Press</a></div>
+      <div class="foot-col"><h4>Support</h4><a href="#">Help Center</a><a href="#">Contact</a><a href="#">Privacy</a><a href="#">Terms</a></div>
+    </div>
+    <div class="foot-bottom">
+      <p class="foot-copy">© 2025 AuraLearn. All rights reserved.</p>
+      <div class="socials">
+        <a href="#">𝕏</a><a href="#">in</a><a href="#">▶</a><a href="#">📸</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<div class="float-btn">⚡ Join Free →</div>
+
+<script>
+// ── DATA ──
+const courses=[
+  {tag:'WEB DEV',title:'Full-Stack Web Development',inst:'Ali Hassan',price:'$49',dur:'48 hrs',stars:'★★★★★',img:'https://images.unsplash.com/photo-1547658719-da2b51169166?w=500&q=80'},
+  {tag:'PYTHON',title:'Python Programming Mastery',inst:'Sara Khan',price:'$39',dur:'36 hrs',stars:'★★★★★',img:'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=500&q=80'},
+  {tag:'AI & ML',title:'AI & Machine Learning',inst:'Dr. Usman',price:'$79',dur:'60 hrs',stars:'★★★★★',img:'https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=500&q=80'},
+  {tag:'UI/UX',title:'UI/UX Design Pro',inst:'Zara Ahmed',price:'$45',dur:'30 hrs',stars:'★★★★☆',img:'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=500&q=80'},
+  {tag:'SECURITY',title:'Cyber Security Expert',inst:'Omar Sheikh',price:'$69',dur:'50 hrs',stars:'★★★★★',img:'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=500&q=80'},
+  {tag:'DATA',title:'Data Science & Analytics',inst:'Noor Fatima',price:'$59',dur:'45 hrs',stars:'★★★★★',img:'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=500&q=80'},
+  {tag:'FLUTTER',title:'Flutter App Development',inst:'Bilal Raza',price:'$55',dur:'40 hrs',stars:'★★★★★',img:'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=500&q=80'},
+  {tag:'JAVA',title:'Java Programming Complete',inst:'Ali Hassan',price:'$35',dur:'32 hrs',stars:'★★★★☆',img:'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=500&q=80'},
+];
+const instructors=[
+  {name:'Ali Hassan',role:'Full-Stack Engineer • Google',courses:'12 Courses',students:'8.4k Students',img:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80'},
+  {name:'Sara Khan',role:'AI/ML Researcher • OpenAI',courses:'8 Courses',students:'12k Students',img:'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80'},
+  {name:'Zara Ahmed',role:'UI/UX Lead • Figma',courses:'6 Courses',students:'9.2k Students',img:'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&q=80'},
+  {name:'Omar Sheikh',role:'Cyber Security • Meta',courses:'5 Courses',students:'6.1k Students',img:'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&q=80'},
+];
+const testis=[
+  {name:'Hamza Raza',role:'Web Developer',text:'AuraLearn transformed my career. The AI quizzes and live sessions are game-changing!',stars:'★★★★★',img:'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&q=80'},
+  {name:'Ayesha Malik',role:'Data Scientist',text:'The ML course quality is insane. Best e-learning platform I have ever used. Period.',stars:'★★★★★',img:'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&q=80'},
+  {name:'Usman Tariq',role:'UI Designer',text:'Got my first design job after 2 months. The certificate really impressed my employer!',stars:'★★★★★',img:'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&q=80'},
+  {name:'Fatima Shah',role:'Python Developer',text:'Live Zoom classes with real engineers from top companies. Absolutely worth it.',stars:'★★★★★',img:'https://images.unsplash.com/photo-1557296387-5358ad7997bb?w=100&q=80'},
+  {name:'Bilal Ahmed',role:'Security Analyst',text:'The cyber security content is deep and practical. Quizzes keep you sharp every day.',stars:'★★★★☆',img:'https://images.unsplash.com/photo-1552058544-f2b08422138a?w=100&q=80'},
+  {name:'Noor Jahan',role:'Student 17yo',text:'Enrolled at 16, landed a freelance client at 17. AuraLearn is pure magic.',stars:'★★★★★',img:'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&q=80'},
+];
+const zoomClasses=[
+  {title:'React & Next.js Masterclass',inst:'Ali Hassan',date:'Today, 7:00 PM PKT',img:'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=500&q=80',live:true},
+  {title:'Machine Learning with Python',inst:'Sara Khan',date:'Tomorrow, 6:00 PM PKT',img:'https://images.unsplash.com/photo-1655720828018-edd2daec9349?w=500&q=80',live:false},
+  {title:'UI/UX Design Sprint',inst:'Zara Ahmed',date:'Wed, 8:00 PM PKT',img:'https://images.unsplash.com/photo-1509343256512-d77a5cb3791b?w=500&q=80',live:false},
+];
+
+// ── RENDER ──
+document.getElementById('courses-grid').innerHTML=courses.map(c=>`
+<div class="cc reveal">
+  <div style="position:relative;overflow:hidden">
+    <img class="cc-thumb" src="${c.img}" alt="${c.title}" loading="lazy"/>
+    <div class="cc-over"></div>
+  </div>
+  <div class="cc-body">
+    <span class="cc-tag">${c.tag}</span>
+    <div class="cc-title">${c.title}</div>
+    <div class="cc-inst">by ${c.inst}</div>
+    <div class="stars">${c.stars}</div>
+    <div class="cc-meta"><span class="cc-price">${c.price}</span><span class="cc-dur">⏱ ${c.dur}</span></div>
+  </div>
+</div>`).join('');
+
+document.getElementById('inst-grid').innerHTML=instructors.map(i=>`
+<div class="ic reveal">
+  <img class="ic-img" src="${i.img}" alt="${i.name}" loading="lazy"/>
+  <div class="ic-body">
+    <div class="ic-name">${i.name}</div>
+    <div class="ic-role">${i.role}</div>
+    <div class="stars" style="margin-bottom:.6rem">★★★★★</div>
+    <div class="ic-stats"><span>📚 ${i.courses}</span><span>👥 ${i.students}</span></div>
+  </div>
+</div>`).join('');
+
+const ti=document.getElementById('testi-inner');
+[...testis,...testis].forEach(t=>{
+  const d=document.createElement('div');
+  d.className='tc';
+  d.innerHTML=`<div class="tc-stars">${t.stars}</div>
+  <p class="tc-text">"${t.text}"</p>
+  <div class="tc-user">
+    <img class="tc-avatar" src="${t.img}" alt="${t.name}" loading="lazy"/>
+    <div class="tc-info"><strong>${t.name}</strong><small>${t.role}</small></div>
+  </div>`;
+  ti.appendChild(d);
+});
+
+document.getElementById('zoom-grid').innerHTML=zoomClasses.map(z=>`
+<div class="zc">
+  <img class="zc-img" src="${z.img}" alt="${z.title}" loading="lazy"/>
+  <div class="zc-body">
+    ${z.live?'<span class="zc-live"><span class="zc-dot"></span>LIVE NOW</span>':'<span class="zc-live" style="background:rgba(6,182,212,.1);border-color:rgba(6,182,212,.3);color:var(--n)">🗓 UPCOMING</span>'}
+    <div class="zc-title">${z.title}</div>
+    <div class="zc-meta">👤 ${z.inst} &nbsp;|&nbsp; 🕐 ${z.date}</div>
+    <button class="btn-join">${z.live?'▶ Join Now':'🔔 Set Reminder'}</button>
+  </div>
+</div>`).join('');
+
+// ── SCROLL REVEAL ──
+const obs=new IntersectionObserver(ents=>{
+  ents.forEach((e,i)=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add('visible'),i*60);obs.unobserve(e.target)}});
+},{threshold:.08});
+document.querySelectorAll('.reveal,.reveal-l,.reveal-r').forEach(el=>obs.observe(el));
+
+// ── COUNTERS ──
+const cObs=new IntersectionObserver(ents=>{
+  ents.forEach(e=>{
+    if(e.isIntersecting){
+      const el=e.target,t=+el.dataset.target,step=t/70;
+      let c=0;
+      const iv=setInterval(()=>{c+=step;if(c>=t){c=t;clearInterval(iv)}el.textContent=Math.floor(c).toLocaleString()+(t===98?'%':t>=1000?'+':'')},18);
+      cObs.unobserve(el);
+    }
+  });
+},{threshold:.5});
+document.querySelectorAll('[data-target]').forEach(el=>cObs.observe(el));
+
+// ── CURSOR ──
+const cur=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.cssText=`left:${mx-6}px;top:${my-6}px`});
+(function a(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.cssText=`left:${rx-20}px;top:${ry-20}px`;requestAnimationFrame(a)})();
+document.querySelectorAll('button,a,.cc,.ic,.pc,.zc').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{ring.style.transform='scale(1.8)';ring.style.borderColor='var(--n)'});
+  el.addEventListener('mouseleave',()=>{ring.style.transform='scale(1)';ring.style.borderColor='var(--p)'});
+});
+
+// ── STAR CANVAS ──
+const bgC=document.getElementById('bg-canvas'),bgCtx=bgC.getContext('2d');
+function resize(){bgC.width=window.innerWidth;bgC.height=window.innerHeight}
+resize();window.addEventListener('resize',resize);
+const stars=Array.from({length:200},()=>({x:Math.random()*bgC.width,y:Math.random()*bgC.height,r:Math.random()*.7+.2,o:Math.random(),d:Math.random()>.5?1:-1,s:Math.random()*.003+.001,vx:(Math.random()-.5)*.05}));
+(function draw(){
+  bgCtx.clearRect(0,0,bgC.width,bgC.height);
+  stars.forEach(s=>{
+    s.o+=s.s*s.d;if(s.o>1||s.o<0)s.d*=-1;
+    s.x+=s.vx;if(s.x>bgC.width)s.x=0;if(s.x<0)s.x=bgC.width;
+    bgCtx.beginPath();bgCtx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    bgCtx.fillStyle=`rgba(${Math.random()>.6?'167,139,250':'103,232,249'},${s.o})`;bgCtx.fill();
+  });requestAnimationFrame(draw);
+})();
+
+// ── ORB FOLLOW ──
+document.addEventListener('mousemove',e=>{document.getElementById('o1').style.cssText=`width:500px;height:500px;background:var(--p);border-radius:50%;pointer-events:none;z-index:0;filter:blur(110px);opacity:.1;position:fixed;left:${e.clientX-250}px;top:${e.clientY-250}px`});
+
+// ── TILT ──
+document.querySelectorAll('.cc,.ic,.pc,.zc').forEach(c=>{
+  c.addEventListener('mousemove',e=>{const r=c.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;c.style.transform=`translateY(-8px) rotateY(${x*10}deg) rotateX(${-y*7}deg)`});
+  c.addEventListener('mouseleave',()=>c.style.transform='');
+});
+
+// ── LIVE COUNT PULSE ──
+let lc=1247;
+setInterval(()=>{lc+=Math.floor(Math.random()*3)-1;document.getElementById('live-count').textContent=lc.toLocaleString()},3000);
+
+// ── NAV SCROLL ──
+window.addEventListener('scroll',()=>{document.querySelector('nav').style.background=window.scrollY>60?'rgba(3,7,18,.92)':'rgba(3,7,18,.7)'});
+</script>
+</body>
+</html>
